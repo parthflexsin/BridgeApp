@@ -10,14 +10,14 @@ import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
   StatusBar,
   NativeModules,
   TouchableOpacity,
   ActivityIndicator,
-  Platform
+  Platform,
+  Modal
 } from 'react-native';
 
 const { TaskManager } = NativeModules
@@ -29,18 +29,14 @@ class App extends Component {
       animating: false
     }
   }
-  async componentDidMount() {
-
-  }
 
   onCalculate = async () => {
     this.setState({ animating: true })
     try {
-      let tasks = await TaskManager.cpuFunctions() //await = "wait this line finished"
-      console.log(tasks)
+      let tasks = await TaskManager.cpuFunctions() //await = "wait till this line is finished"
       this.setState({ animating: false })
       setTimeout(() => {
-        alert(`Result of CPU-intensive task is = ${Platform.OS=='android'?tasks: tasks[0].value}`)
+        alert(`Result of CPU-intensive task is = ${Platform.OS == 'android' ? tasks : tasks[0].value}`)
       }, 300);
     } catch (error) {
       this.setState({ animating: false })
@@ -55,11 +51,19 @@ class App extends Component {
     return (
       <>
         <StatusBar barStyle="dark-content" />
-        <SafeAreaView style={{ flex: 1, alignItems: "center", justifyContent: 'center' }}>
-          <TouchableOpacity onPress={this.onCalculate} style={{ height: 50, width: 100, backgroundColor: "#3399cc", borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: "#fff", fontWeight: '700', fontSize: 15 }}>Calculate</Text>
+        <SafeAreaView style={styles.safeAreaView}>
+          <TouchableOpacity onPress={this.onCalculate} style={styles.buttonStyle}>
+            <Text style={styles.buttonText}>Calculate</Text>
           </TouchableOpacity>
-          {/* {animating && <ActivityIndicator size="large" color="red" />} */}
+          <Modal
+            transparent={true}
+            animationType="slide"
+            visible={animating}
+            onRequestClose={() => { }}>
+            <View style={styles.container}>
+              <ActivityIndicator size="large" color="red" />
+            </View>
+          </Modal>
         </SafeAreaView>
       </>
     );
@@ -67,6 +71,10 @@ class App extends Component {
 };
 
 const styles = StyleSheet.create({
+  safeAreaView: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  buttonStyle: { height: 50, width: 100, backgroundColor: "#3399cc", borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  buttonText: { color: "#fff", fontWeight: '700', fontSize: 15 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.2)', },
 });
 
 export default App;
