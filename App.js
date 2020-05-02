@@ -16,7 +16,8 @@ import {
   StatusBar,
   NativeModules,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from 'react-native';
 
 const { TaskManager } = NativeModules
@@ -36,14 +37,15 @@ class App extends Component {
     this.setState({ animating: true })
     try {
       let tasks = await TaskManager.cpuFunctions() //await = "wait this line finished"
+      console.log(tasks)
       this.setState({ animating: false })
       setTimeout(() => {
-        alert(`Result of CPU-intensive task is = ${tasks[0].value}`)
+        alert(`Result of CPU-intensive task is = ${Platform.OS=='android'?tasks: tasks[0].value}`)
       }, 300);
     } catch (error) {
       this.setState({ animating: false })
       setTimeout(() => {
-        alert(`Error's: ${error.code}, userInfo = ${JSON.stringify(error.userInfo)}`)
+        alert(`Error's: ${error}`)
       }, 300);
     }
   }
@@ -57,7 +59,7 @@ class App extends Component {
           <TouchableOpacity onPress={this.onCalculate} style={{ height: 50, width: 100, backgroundColor: "#3399cc", borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}>
             <Text style={{ color: "#fff", fontWeight: '700', fontSize: 15 }}>Calculate</Text>
           </TouchableOpacity>
-          {animating && <ActivityIndicator size="large" color="red" />}
+          {/* {animating && <ActivityIndicator size="large" color="red" />} */}
         </SafeAreaView>
       </>
     );
